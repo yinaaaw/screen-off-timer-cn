@@ -1,0 +1,92 @@
+name: Build Release APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - zh-cn
+    paths-ignore:
+      - '**.md'
+      - 'fastlane/**'
+      - 'screenshot/**'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK components
+        run: |
+          echo "=== 安装 SDK 组件 ==="
+          # compileSdk 为 36.1（AGP9 新 DSL: release(36){minorApiLevel=1}）
+          sdkmanager "platforms;android-36" "platform-tools" || true
+          sdkmanager "platforms;android-36.1" || sdkmanager "platforms;android-36" || true
+          sdkmanager "build-tools;36.0.0" || sdkmanager "build-tools;35.0.0" || true
+          echo "=== 已安装组件 ==="
+          sdkmanager --list_installed 2>/dev/null | head -30
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'gradle/libs.versions.toml') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew :app:assembleRelease --stacktrace --no-daemon
+
+      - name: Rename and list APK
+        id: apk
+        run: |
+          mkdir -p out
+          APK=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
+          if [ -z "$APK" ]; then
+            echo "::error::未找到 APK 产物"
+            find app/build/outputs -type f || true
+            exit 1
+          fi
+          DST="out/screen-off-timer-zh-cn-release.apk"
+          cp "$APK" "$DST"
+          echo "apk=$DST" >> $GITHUB_OUTPUT
+          ls -lh out/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: screen-off-timer-zh-cn-release
+          path: out/screen-off-timer-zh-cn-release.apk
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload build reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports
+          path: |
+            **/build/reports/
+            app/build/outputs/logs/
+          retention-days: 7
+          if-no-files-found: ignore
