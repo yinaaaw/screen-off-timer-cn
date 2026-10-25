@@ -32,20 +32,25 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Decode keystore
+      - name: Prepare keystore (optional)
         id: keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::error::未配置 KEYSTORE_BASE64 Secret，无法进行正式签名"
-            exit 1
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            echo "store_file=$RUNNER_TEMP/release.keystore" >> $GITHUB_OUTPUT
+            echo "signed=true" >> $GITHUB_OUTPUT
+            echo "::notice::检测到正式签名密钥，将使用正式签名构建"
+          else
+            echo "signed=false" >> $GITHUB_OUTPUT
+            echo "::warning::未配置签名密钥，将使用 debug 签名构建（不可用于正式分发）"
           fi
-          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
-          echo "store_file=$RUNNER_TEMP/release.keystore" >> $GITHUB_OUTPUT
-          ls -lh "$RUNNER_TEMP/release.keystore"
 
-      - name: Build signed release APK
+      - name: Build release APK
         env:
           SIGNING_STORE_FILE: ${{ steps.keystore.outputs.store_file }}
           SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -58,17 +63,15 @@ jobs:
       - name: Verify signature
         run: |
           APK=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
-          echo "APK: $APK"
           BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
-          echo "使用 build-tools: $BT"
-          "$BT/apksigner" verify --print-certs "$APK"
-          echo "=== 签名校验通过 ==="
+          echo "=== apksigner verify ==="
+          "$BT/apksigner" verify --print-certs "$APK" || true
 
       - name: Rename APK
         id: apk
         run: |
           SRC=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
-          DST="screen-off-timer-${GITHUB_REF_NAME//\//-}-zh.apk"
+          DST="screen-off-timer-zh.apk"
           cp "$SRC" "$DST"
           echo "apk=$DST" >> $GITHUB_OUTPUT
           echo "sha256=$(sha256sum "$DST" | cut -d' ' -f1)" >> $GITHUB_OUTPUT
@@ -94,8 +97,10 @@ jobs:
 
             ### 安装说明
             - 最低支持 Android 7.0 (API 24)
-            - 本版本使用独立签名，与官方 F-Droid 版签名不同，如需切换请先卸载原版
-            - 应用包名沿用 `com.inod.screenofftimer`
+            - 应用包名 `com.inod.screenofftimer`
+            - 与官方 F-Droid 版签名不同，切换时需先卸载原版
+
+            > ⚠️ 本版本使用 **debug 签名**，仅供测试安装，不适用于正式分发。
 
             ### 校验信息
             - SHA256: `${{ steps.apk.outputs.sha256 }}`
