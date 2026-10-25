@@ -25,6 +25,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
+import com.inod.screenofftimer.R
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inod.screenofftimer.viewmodel.TimerViewModel
@@ -148,7 +150,7 @@ fun TimerProgress(viewModel: TimerViewModel) {
                 )
             )
             Text(
-                text = "Min : Sec",
+                text = stringResource(R.string.timer_unit),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Medium,

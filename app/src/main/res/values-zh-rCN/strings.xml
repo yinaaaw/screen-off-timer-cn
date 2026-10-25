@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用名称 -->
+    <string name="app_name">熄屏定时器</string>
+
+    <!-- 无障碍服务说明（系统设置页展示） -->
+    <string name="accessibility_summary">自动锁屏服务。</string>
+    <string name="accessibility_description">倒计时结束时自动锁屏功能必须依赖此权限。\n此服务在本地运行，不会收集、存储或监控任何个人数据或屏幕活动。</string>
+
+    <!-- 设备管理员说明（系统授权弹窗展示） -->
+    <string name="device_admin_description">用于在睡眠定时结束时自动锁定屏幕。</string>
+
+    <!-- 主界面 -->
+    <string name="home_title">熄屏定时器</string>
+    <string name="action_settings">设置</string>
+    <string name="timer_unit">分 : 秒</string>
+    <string name="option_turn_off_music_title">关闭音乐</string>
+    <string name="option_turn_off_music_desc">到时暂停所有媒体播放</string>
+    <string name="option_lock_screen_title">锁定屏幕</string>
+    <string name="option_lock_screen_desc">到时自动锁定设备屏幕</string>
+
+    <!-- 通知权限弹窗 -->
+    <string name="dialog_notif_permission_title">需要通知权限</string>
+    <string name="dialog_notif_permission_desc">需要通知权限才能显示实时倒计时，并确保定时器在后台可靠运行，请开启通知权限。</string>
+    <string name="dialog_notif_permission_no_show">不再提示</string>
+
+    <!-- 选择锁屏方式弹窗 -->
+    <string name="dialog_lock_method_title">选择锁屏方式</string>
+    <string name="dialog_lock_method_desc">请选择如何自动锁定屏幕。</string>
+    <string name="dialog_lock_method_accessibility">无障碍服务</string>
+    <string name="dialog_lock_method_admin">设备管理员</string>
+
+    <!-- 通用按钮 -->
+    <string name="action_agree">同意</string>
+    <string name="action_cancel">取消</string>
+
+    <!-- Toast 提示 -->
+    <string name="toast_enable_notification">请开启通知权限，以保证定时器正常运行。</string>
+
+    <!-- 设置界面 -->
+    <string name="settings_title">设置</string>
+    <string name="action_back">返回</string>
+    <string name="settings_section_theme">主题</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="theme_system">跟随系统</string>
+    <string name="settings_dynamic_color_title">动态取色</string>
+    <string name="settings_dynamic_color_desc">使用设备壁纸的配色</string>
+    <string name="settings_section_option">选项</string>
+    <string name="settings_go_home_title">返回桌面</string>
+    <string name="settings_go_home_desc">定时结束后返回桌面</string>
+    <string name="settings_auto_close_title">启动即关闭</string>
+    <string name="settings_auto_close_desc">定时器启动后自动关闭本应用</string>
+    <string name="settings_open_app_title">打开应用</string>
+    <string name="settings_open_app_desc">定时结束后重新打开本应用（需要无障碍权限）</string>
+    <string name="settings_section_permission">权限</string>
+    <string name="settings_notification_title">通知</string>
+    <string name="settings_notification_desc">允许应用显示定时器与状态通知</string>
+    <string name="settings_accessibility_title">无障碍</string>
+    <string name="settings_accessibility_desc">用于控制息屏与系统操作</string>
+    <string name="settings_device_admin_title">设备管理员</string>
+    <string name="settings_device_admin_desc">通过设备管理员权限锁屏，卸载前请先关闭此权限</string>
+    <string name="settings_section_info">关于</string>
+    <string name="settings_donate_title">打赏支持</string>
+    <string name="settings_donate_desc">支持一下 :)</string>
+    <string name="settings_libraries_title">开源库</string>
+    <string name="settings_libraries_desc">本应用使用的开源库</string>
+
+    <!-- 设备管理员权限弹窗 -->
+    <string name="dialog_device_admin_title">设备管理员权限</string>
+    <string name="dialog_device_admin_desc_body">设备管理员权限用于锁定设备\n\n</string>
+    <string name="dialog_device_admin_desc_line1">* 不收集、不存储、不分享任何个人信息。\n</string>
+    <string name="dialog_device_admin_desc_line2">* 如需卸载应用，请先关闭此权限。</string>
+
+    <!-- 其他 -->
+    <string name="options_content_desc">选项</string>
+    <string name="libraries_title">开源库</string>
+
+    <!-- 通知 -->
+    <string name="notification_channel_name">睡眠定时</string>
+    <string name="notification_channel_desc">定时器通知</string>
+    <string name="notification_title">睡眠定时</string>
+    <string name="notification_content_sleep_in">%1$s 后进入睡眠</string>
+    <string name="notification_action_stop">停止</string>
+    <string name="notification_action_reduce">- 10 分钟</string>
+    <string name="notification_action_add">+ 10 分钟</string>
+    <string name="notification_go_home_title">睡眠定时</string>
+    <string name="notification_go_home_content">点击返回桌面</string>
+
+    <!-- 设备管理员请求说明 -->
+    <string name="device_admin_request_explain">用于自动锁定屏幕</string>
+</resources>

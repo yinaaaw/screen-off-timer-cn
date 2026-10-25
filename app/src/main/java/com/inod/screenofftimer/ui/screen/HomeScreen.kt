@@ -43,10 +43,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.inod.screenofftimer.R
 import com.inod.screenofftimer.core.permission.AccessibilityPermission
 import com.inod.screenofftimer.core.permission.NotificationPermission
 import com.inod.screenofftimer.service.isDpmActive
@@ -194,7 +196,7 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Screen Off Timer",
+                        text = stringResource(R.string.home_title),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
                     )
@@ -205,7 +207,7 @@ fun HomeScreen(
                         Icon(
                             modifier = Modifier.size(25.dp),
                             imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = stringResource(R.string.action_settings),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -251,8 +253,8 @@ fun HomeScreen(
 
             ListSection {
                 ListOption(
-                    title = "Turn Off Music",
-                    description = "All media will be turn off",
+                    title = stringResource(R.string.option_turn_off_music_title),
+                    description = stringResource(R.string.option_turn_off_music_desc),
                     enabled = !isRunning,
                     icon = Icons.Default.MusicOff,
                     onClick = { viewModel.updateStopMedia(!isStopMedia) },
@@ -263,8 +265,8 @@ fun HomeScreen(
                             onCheckedChange = { viewModel.updateStopMedia(it) })
                     })
                 ListOption(
-                    title = "Lock Screen",
-                    description = "Automatically lock the device screen",
+                    title = stringResource(R.string.option_lock_screen_title),
+                    description = stringResource(R.string.option_lock_screen_desc),
                     enabled = !isRunning,
                     icon = Icons.Default.Lock,
                     onClick = { handleToggleLockscreen(!lockScreenEnabled) },
@@ -281,12 +283,10 @@ fun HomeScreen(
         //modal dialog notif
         ModalDialog(
             show = showNotifPermissionDialog,
-            title = "Notification Permission Required",
-            description = "Notification permission is required to display real-time countdown updates " +
-                    "and ensure the timer runs reliably in the background, " +
-                    "please enable notifications.",
-            confirmText = "Agree",
-            dismissText = "Cancel",
+            title = stringResource(R.string.dialog_notif_permission_title),
+            description = stringResource(R.string.dialog_notif_permission_desc),
+            confirmText = stringResource(R.string.action_agree),
+            dismissText = stringResource(R.string.action_cancel),
             onConfirm = {
                 showNotifPermissionDialog = false
                 openNotifSetting(activity)
@@ -297,7 +297,7 @@ fun HomeScreen(
                     showToastProperly(context)
                 }
             },
-            leftButton = "Don't show again",
+            leftButton = stringResource(R.string.dialog_notif_permission_no_show),
             onLeftButton = { handleNotShowAgain() },
         )
 
@@ -311,15 +311,15 @@ fun HomeScreen(
                 val dpmActive = isDpmActive(context)
                 viewModel.updateDeviceAdmin(dpmActive)
             },
-            title = "Choose Lock Method",
-            description = "Select how the screen should be locked automatically.",
-            leftButton = "Accessibility Service",
-            dismissText = "Cancel",
+            title = stringResource(R.string.dialog_lock_method_title),
+            description = stringResource(R.string.dialog_lock_method_desc),
+            leftButton = stringResource(R.string.dialog_lock_method_accessibility),
+            dismissText = stringResource(R.string.action_cancel),
             onLeftButton = {
                 showLockMethodDialog = false
                 openAccessibilitySettings(context)
             },
-            confirmText = "Admin",
+            confirmText = stringResource(R.string.dialog_lock_method_admin),
             onConfirm = {
                 showLockMethodDialog = false
                 requestDeviceAdmin(context)
@@ -350,7 +350,7 @@ fun isNotifGranted(activity: Activity): Boolean {
 private fun showToastProperly(context: Context) {
     Toast.makeText(
         context,
-        "Please enable notifications for the timer to run properly.",
+        context.getString(R.string.toast_enable_notification),
         Toast.LENGTH_LONG
     ).show()
 }

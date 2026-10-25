@@ -50,12 +50,14 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
+import com.inod.screenofftimer.R
 import com.inod.screenofftimer.core.permission.AccessibilityPermission
 import com.inod.screenofftimer.core.permission.NotificationPermission
 import com.inod.screenofftimer.service.isDpmActive
@@ -105,10 +107,11 @@ fun SettingsScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val options = listOf(
-        "Light" to ThemeMode.LIGHT,
-        "Dark" to ThemeMode.DARK,
-        "System" to ThemeMode.SYSTEM
+    val options = listOf(ThemeMode.LIGHT, ThemeMode.DARK, ThemeMode.SYSTEM)
+    val optionLabels = listOf(
+        stringResource(R.string.theme_light),
+        stringResource(R.string.theme_dark),
+        stringResource(R.string.theme_system)
     )
 
     val icons = listOf(
@@ -158,7 +161,7 @@ fun SettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.settings_title),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
                     )
@@ -173,7 +176,7 @@ fun SettingsScreen(
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.action_back),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -188,17 +191,17 @@ fun SettingsScreen(
             contentPadding = PaddingValues(bottom = 32.dp)
         ) {
             item {
-                ListSection(title = "Theme", titleIcon = Icons.Outlined.Palette) {
+                ListSection(title = stringResource(R.string.settings_section_theme), titleIcon = Icons.Outlined.Palette) {
                     ListOption(
                         onClick = {},
                         bgColor = Color.Transparent,
                         bottomContent = {
                             HorizontalSelected(
-                                options = options.map { it.first },
+                                options = optionLabels,
                                 icons = icons,
-                                selectedIndex = options.indexOfFirst { it.second == settings.theme },
+                                selectedIndex = options.indexOfFirst { it == settings.theme },
                                 onSelect = { index ->
-                                    viewModel.updateTheme(options[index].second)
+                                    viewModel.updateTheme(options[index])
                                 }
                             )
                         }
@@ -206,9 +209,9 @@ fun SettingsScreen(
 
                     ListOption(
                         bgColor = MaterialTheme.colorScheme.surfaceContainer,
-                        title = "Dynamic color",
+                        title = stringResource(R.string.settings_dynamic_color_title),
                         enabled = isDynamicColorSupported,
-                        description = "Use color from your device",
+                        description = stringResource(R.string.settings_dynamic_color_desc),
                         clip = RoundedCornerShape(16.dp),
                         padding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
                         icon = Icons.Default.AutoAwesome,
@@ -228,10 +231,10 @@ fun SettingsScreen(
 
             // options
             item {
-                ListSection(title = "Option", titleIcon = Icons.Outlined.Tune, padding = PaddingValues(top = 10.dp)) {
+                ListSection(title = stringResource(R.string.settings_section_option), titleIcon = Icons.Outlined.Tune, padding = PaddingValues(top = 10.dp)) {
                     ListOption(
-                        title = "Go Home",
-                        description = "Go home after timer finished",
+                        title = stringResource(R.string.settings_go_home_title),
+                        description = stringResource(R.string.settings_go_home_desc),
                         icon = Icons.Default.Home,
                         onClick = { viewModel.updateGoHome(!settings.isGoHome) },
                         trailing = {
@@ -243,8 +246,8 @@ fun SettingsScreen(
                     )
 
                     ListOption(
-                        title = "Auto close on start",
-                        description = "Automatically close the app when the timer starts",
+                        title = stringResource(R.string.settings_auto_close_title),
+                        description = stringResource(R.string.settings_auto_close_desc),
                         icon = Icons.AutoMirrored.Filled.ExitToApp,
                         onClick = { viewModel.updateAutoCloseOnStart(!settings.isAutoCloseOnStart) },
                         trailing = {
@@ -256,8 +259,8 @@ fun SettingsScreen(
                     )
 
                     ListOption(
-                        title = "Open app",
-                        description = "Open this app after timer finished (requires Accessibility)",
+                        title = stringResource(R.string.settings_open_app_title),
+                        description = stringResource(R.string.settings_open_app_desc),
                         icon = Icons.AutoMirrored.Filled.OpenInNew,
                         onClick = {
                             val next = !settings.openApp
@@ -279,11 +282,11 @@ fun SettingsScreen(
 
             // permission
             item {
-                ListSection(title = "Permission", padding = PaddingValues(top = 10.dp), titleIcon = Icons.Default.Security) {
+                ListSection(title = stringResource(R.string.settings_section_permission), padding = PaddingValues(top = 10.dp), titleIcon = Icons.Default.Security) {
                     ListOption(
                         onClick = { openNotifPermission(activity) },
-                        title = "Notification",
-                        description = "Allow app to show timer and status notifications",
+                        title = stringResource(R.string.settings_notification_title),
+                        description = stringResource(R.string.settings_notification_desc),
                         icon = Icons.Default.Notifications,
                         trailing = {
                             SwitchStyle(
@@ -295,8 +298,8 @@ fun SettingsScreen(
 
                     ListOption(
                         onClick = { openAccessibility(context) },
-                        title = "Accessibility",
-                        description = "Required to control screen off and system actions",
+                        title = stringResource(R.string.settings_accessibility_title),
+                        description = stringResource(R.string.settings_accessibility_desc),
                         icon = Icons.Default.Accessibility,
                         trailing = {
                             SwitchStyle(
@@ -308,8 +311,8 @@ fun SettingsScreen(
 
                     ListOption(
                         onClick = { handleToggleAdmin(!deviceAdmin) },
-                        title = "Device Admin",
-                        description = "Lock screen via device admin permission, disable this before uninstalling the app",
+                        title = stringResource(R.string.settings_device_admin_title),
+                        description = stringResource(R.string.settings_device_admin_desc),
                         icon = Icons.Default.AdminPanelSettings,
                         trailing = {
                             SwitchStyle(
@@ -323,18 +326,18 @@ fun SettingsScreen(
 
             // info
             item {
-                ListSection(title = "Info", padding = PaddingValues(top = 10.dp, bottom = 10.dp), titleIcon = Icons.Outlined.Info) {
+                ListSection(title = stringResource(R.string.settings_section_info), padding = PaddingValues(top = 10.dp, bottom = 10.dp), titleIcon = Icons.Outlined.Info) {
                     ListOption(
                         onClick = { openUrl(context, "https://ko-fi.com/inodxx") },
-                        title = "Donate",
-                        description = "Support me :)",
+                        title = stringResource(R.string.settings_donate_title),
+                        description = stringResource(R.string.settings_donate_desc),
                         icon = Icons.Default.Favorite
                     )
 
                     ListOption(
                         onClick = { navController.navigate("libraries") },
-                        title = "Open-source Libraries",
-                        description = "Open-source Libraries used in this app",
+                        title = stringResource(R.string.settings_libraries_title),
+                        description = stringResource(R.string.settings_libraries_desc),
                         icon = Icons.Default.Code
                     )
                 }
@@ -342,20 +345,20 @@ fun SettingsScreen(
         }
 
         val descriptionText = buildAnnotatedString {
-            append("Device Admin permission is used to lock the device\n\n")
+            append(stringResource(R.string.dialog_device_admin_desc_body))
             withStyle(style = SpanStyle(fontSize = 12.sp)) {
-                append("* No collect, store, or share any personal information.\n")
-                append("* Disable this permission, if you want to uninstall the app.")
+                append(stringResource(R.string.dialog_device_admin_desc_line1))
+                append(stringResource(R.string.dialog_device_admin_desc_line2))
             }
         }
 
         //modal dialog admin
         ModalDialog(
             show = showDialogAdmin,
-            title = "Device Admin Permission",
+            title = stringResource(R.string.dialog_device_admin_title),
             description = descriptionText,
-            confirmText = "Agree",
-            dismissText = "Cancel",
+            confirmText = stringResource(R.string.action_agree),
+            dismissText = stringResource(R.string.action_cancel),
             onConfirm = {
                 showDialogAdmin = false
                 requestDeviceAdmin(context)

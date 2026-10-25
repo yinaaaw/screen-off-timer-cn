@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.inod.screenofftimer.R
 import com.inod.screenofftimer.data.Prefs
 
 class MyDeviceAdminReceiver : DeviceAdminReceiver() {
@@ -38,7 +39,7 @@ fun requestDeviceAdmin(context: Context) {
         putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, component)
         putExtra(
             DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-            "Required to lock screen automatically"
+            context.getString(R.string.device_admin_request_explain)
         )
     }
     context.startActivity(intent)

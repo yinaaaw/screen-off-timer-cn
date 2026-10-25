@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
+import androidx.compose.ui.res.stringResource
+import com.inod.screenofftimer.R
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,7 +46,7 @@ fun ListSection(
 
                 Icon(
                     imageVector = titleIcon!! ,
-                    contentDescription = "Options",
+                    contentDescription = stringResource(R.string.options_content_desc),
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )

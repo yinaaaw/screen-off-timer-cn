@@ -76,8 +76,8 @@ class MediaUtils () {
         )
 
         val notification = NotificationCompat.Builder(context, DEFAULT)
-            .setContentTitle("Sleep Timer")
-            .setContentText("Tap to return to the home screen")
+            .setContentTitle(context.getString(R.string.notification_go_home_title))
+            .setContentText(context.getString(R.string.notification_go_home_content))
             .setSmallIcon(R.drawable.ic_stat_sleep_timer)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
