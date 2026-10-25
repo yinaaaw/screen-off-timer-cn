@@ -11,6 +11,11 @@ on:
         description: '是否标记为预发布'
         required: false
         default: 'false'
+  push:
+    branches:
+      - master
+    paths:
+      - 'release-trigger.txt'
 
 permissions:
   contents: write
@@ -21,6 +26,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Resolve tag name
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+            PRE="${{ inputs.prerelease }}"
+          else
+            # push 触发：从 release-trigger.txt 读取标签名，缺省用默认
+            if [ -f release-trigger.txt ]; then
+              TAG=$(head -1 release-trigger.txt | tr -d '[:space:]')
+            fi
+            [ -z "$TAG" ] && TAG="v1.3.9-zh"
+            PRE="false"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "prerelease=$PRE" >> $GITHUB_OUTPUT
+          echo "解析标签: $TAG"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -36,9 +59,6 @@ jobs:
         id: keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
@@ -80,9 +100,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.tag }}
-          name: ${{ inputs.tag }}
-          prerelease: ${{ inputs.prerelease }}
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.tag }}
+          prerelease: ${{ steps.meta.outputs.prerelease }}
           draft: false
           generate_release_notes: true
           body: |
