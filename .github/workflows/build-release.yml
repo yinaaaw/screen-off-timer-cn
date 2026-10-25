@@ -28,18 +28,41 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install SDK components
+      - name: Show pre-installed Android SDK
         run: |
-          echo "=== 安装 SDK 组件 ==="
-          # compileSdk 为 36.1（AGP9 新 DSL: release(36){minorApiLevel=1}）
-          sdkmanager "platforms;android-36" "platform-tools" || true
-          sdkmanager "platforms;android-36.1" || sdkmanager "platforms;android-36" || true
-          sdkmanager "build-tools;36.0.0" || sdkmanager "build-tools;35.0.0" || true
-          echo "=== 已安装组件 ==="
-          sdkmanager --list_installed 2>/dev/null | head -30
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          echo "--- 预装 platforms ---"
+          ls -1 "$ANDROID_HOME/platforms" 2>/dev/null || echo "(无)"
+          echo "--- 预装 build-tools ---"
+          ls -1 "$ANDROID_HOME/build-tools" 2>/dev/null || echo "(无)"
+          echo "--- cmdline-tools ---"
+          ls -1 "$ANDROID_HOME/cmdline-tools" 2>/dev/null || echo "(无)"
+
+      - name: Install SDK components if missing
+        run: |
+          set -e
+          SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          echo "SDK_ROOT=$SDK_ROOT"
+
+          # 定位 sdkmanager
+          SDKMGR=""
+          if [ -x "$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
+            SDKMGR="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          else
+            SDKMGR="$(find "$SDK_ROOT" -name sdkmanager -type f 2>/dev/null | head -1)"
+          fi
+          echo "sdkmanager=$SDKMGR"
+
+          if [ -n "$SDKMGR" ]; then
+            # compileSdk = 36.1 (AGP9 DSL: release(36){ minorApiLevel = 1 })
+            yes | "$SDKMGR" --licenses > /dev/null 2>&1 || true
+            "$SDKMGR" "platforms;android-36" > /dev/null 2>&1 || true
+            "$SDKMGR" "platforms;android-36.1" > /dev/null 2>&1 || true
+            "$SDKMGR" "build-tools;36.0.0" > /dev/null 2>&1 || true
+            echo "--- 安装后 platforms ---"
+            ls -1 "$SDK_ROOT/platforms" 2>/dev/null || true
+          fi
 
       - name: Cache Gradle
         uses: actions/cache@v4
