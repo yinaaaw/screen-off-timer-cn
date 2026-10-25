@@ -1,9 +1,32 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.aboutlibraries)
     alias(libs.plugins.kotlin.serialization)
 }
+
+// 读取签名配置：优先使用环境变量（CI Secrets 注入），
+// 其次读取 keystore.properties（本地开发），都没有则回退 debug 签名。
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
+fun signingValue(envKey: String, propKey: String): String? =
+    System.getenv(envKey)?.takeIf { it.isNotBlank() }
+        ?: keystoreProps.getProperty(propKey)?.takeIf { it.isNotBlank() }
+
+val releaseStoreFile: String? = signingValue("SIGNING_STORE_FILE", "storeFile")
+val releaseStorePassword: String? = signingValue("SIGNING_STORE_PASSWORD", "storePassword")
+val releaseKeyAlias: String? = signingValue("SIGNING_KEY_ALIAS", "keyAlias")
+val releaseKeyPassword: String? = signingValue("SIGNING_KEY_PASSWORD", "keyPassword")
+
+val hasReleaseSigning = releaseStoreFile != null &&
+        releaseStorePassword != null &&
+        releaseKeyAlias != null &&
+        releaseKeyPassword != null
 
 android {
     namespace = "com.inod.screenofftimer"
@@ -29,6 +52,19 @@ android {
         includeInBundle = false
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+                enableV1Signing = true
+                enableV2Signing = true
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -37,7 +73,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            // 有正式密钥则用正式签名，否则回退 debug（保证本地仍可构建）
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
     compileOptions {
